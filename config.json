@@ -1,0 +1,16 @@
+{
+  "lab": {
+    "id": "chemistry",
+    "title": "Chemistry Lab",
+    "subtitle": "Virtual Labs \u2013 Experiment Review",
+    "description": "Review and test the experiments developed for the Chemistry Lab."
+  },
+  "experiments": [
+    {
+      "id": "edta-hardness-of-water",
+      "title": "Determination of Hardness of Water Using EDTA Titration",
+      "path": "./experiments/edta-hardness-of-water",
+      "enabled": true
+    }
+  ]
+}

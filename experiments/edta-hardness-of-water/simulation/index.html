@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOLVE - Determination of Hardness of Water Using EDTA Titration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
+  <link rel="stylesheet" href="./css/general.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/media.css" />
+  <link rel="stylesheet" href="./css/simulation.css" />
+  <script defer src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script defer src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <script defer type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="./js/experiment-bundle.js"></script>
+</head>
+<body>
+  <div class="container">
+  <div class="title">
+    <img src="./images/logo_nitk.png" alt="logo" class="logo"/>
+    <h1>Determination of Hardness of Water Using EDTA Titration</h1>
+  </div>
+  <div class="main">
+    <div class="simulation-main">
+        <div class="simulation">                      
+          <h3 class="section-title">Simulation</h3>
+          <div class="task-section--simulation">
+            <div class="section-canvas">
+                <div id="simscreen-container" class="simscreen-wrapper">
+                  <!-- Step Guidance Bar -->
+                  <div id="simStepBar" class="sim-step-bar">
+                    <div class="sim-step-header">
+                      <span id="simPhaseBadge" class="sim-phase-badge">Phase 1: Standardization</span>
+                      <span id="simStepBadge" class="sim-step-badge">Step 1 of 8</span>
+                    </div>
+                    <p id="simStepInstruction" class="sim-step-instruction">
+                      Step 1: Fill the burette with EDTA solution using the funnel up to the 0.00 mL mark.
+                    </p>
+                    <div id="simStepFeedback" class="sim-step-feedback"></div>
+                  </div>
+
+                  <!-- Meniscus Magnifier -->
+                  <div class="meniscus-magnifier" title="Eye-Level Burette Meniscus View">
+                    <div class="meniscus-magnifier-title">Burette Meniscus</div>
+                    <div class="meniscus-canvas-box">
+                      <canvas id="meniscusCanvas" width="120" height="75"></canvas>
+                    </div>
+                    <div id="meniscusReadingLabel" class="meniscus-reading-label">0.00 mL</div>
+                  </div>
+
+                  <!-- Live HUD -->
+                  <div class="sim-hud">
+                    <div class="sim-hud-card">
+                      <div class="sim-hud-title">Burette</div>
+                      <div id="hudBuretteReading" class="sim-hud-value">0.00 mL</div>
+                    </div>
+                    <div class="sim-hud-card">
+                      <div class="sim-hud-title">Titre</div>
+                      <div id="hudTitreVolume" class="sim-hud-value">0.00 mL</div>
+                    </div>
+                    <div class="sim-hud-card">
+                      <div class="sim-hud-title">Stopcock</div>
+                      <span id="hudStopcockBadge" class="stopcock-status-badge closed">CLOSED</span>
+                    </div>
+                    <div class="sim-hud-card">
+                      <div class="sim-hud-title">Color</div>
+                      <div id="hudColorBadge" class="sim-hud-value" style="font-size: 1.1rem;">Clear</div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="var-controls">
+          <div class="variables">
+            <h3 class="section-title">variables</h3>
+            <div class="task-section--variables">
+              <!-- Water Sample Preset -->
+              <div class="var-div">
+                <div class="input-container" style="grid-template-columns: 1fr;">
+                  <label for="varSamplePreset"><p title="Water Sample Preset">Water Sample Preset</p></label>
+                  <select id="varSamplePreset" class="ui-selectmenu-button" style="width: 100%; padding: 0.35rem 0.5rem; border: 1px solid #417472; border-radius: 4px; font-size: 1.2rem; font-family: inherit;">
+                    <option value="75">Sample A (Soft ~75 ppm)</option>
+                    <option value="160">Sample B (Moderate ~160 ppm)</option>
+                    <option value="240" selected>Sample C (Hard Tap ~240 ppm)</option>
+                    <option value="450">Sample D (Borewell ~450 ppm)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- EDTA Salt Mass transferred -->
+              <div class="var-div">
+                <div class="input-container">
+                  <label for="varEdtaMass"><p title="Mass of EDTA salt transferred (W = W1 - W2)">EDTA Mass (W)</p></label>
+                  <input class="var-spinner" id="varEdtaMass" type="number" name="value" value="0.930" min="0.800" max="1.100" step="0.005" />
+                  <span id="varEdtaMassVal">g</span>
+                </div>
+              </div>
+
+              <!-- Volumetric Flask Volume -->
+              <div class="var-div">
+                <div class="input-container">
+                  <label for="varFlaskVolume"><p title="Volumetric Flask Capacity">Flask Vol</p></label>
+                  <input class="var-spinner" id="varFlaskVolume" type="number" name="value" value="250" readonly disabled style="background:#f1f5f9; color:#475569;" />
+                  <span id="varFlaskVolumeVal">mL</span>
+                </div>
+              </div>
+
+              <!-- Water Sample Volume -->
+              <div class="var-div">
+                <div class="input-container">
+                  <label for="varSampleVolume"><p title="Pipetted Water Sample Volume (Professor Manual)">Sample Vol</p></label>
+                  <input class="var-spinner" id="varSampleVolume" type="number" name="value" value="25" min="25" max="25" step="0" readonly disabled style="background:#f1f5f9; color:#475569;" />
+                  <span id="varSampleVolumeVal">mL</span>
+                </div>
+              </div>
+
+              <!-- Ammonia Buffer Volume -->
+              <div class="var-div">
+                <div class="input-container">
+                  <label for="varBufferVolume"><p title="NH3-NH4Cl Buffer Volume (pH 10)">Buffer (pH 10)</p></label>
+                  <input class="var-spinner" id="varBufferVolume" type="number" name="value" value="3.0" min="2.0" max="5.0" step="0.5" />
+                  <span id="varBufferVolumeVal">mL</span>
+                </div>
+              </div>
+
+              <!-- Titration Flow Rate -->
+              <div class="var-div">
+                <div class="input-container">
+                  <label for="varFlowRate"><p title="Titration Speed">Flow Rate</p></label>
+                  <input class="var-spinner" id="varFlowRate" type="number" name="value" value="0.6" min="0.1" max="1.5" step="0.1" />
+                  <span id="varFlowRateVal">mL/s</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <h3 class="section-title">controls</h3>
+            <div class="desktop-controls">
+              <!-- Phase Switch -->
+              <button id="btnSwitchPhase" class="ctrl-btn" style="background: #0f766e; color: #ffffff; font-size: 1.15rem; margin-bottom: 0.4rem;">
+                Proceed to Phase 2 (Water Hardness) ➜
+              </button>
+
+              <div class="controls-actions-grid" id="controlsActionsGrid">
+                <!-- Buttons dynamically labeled and managed in experiment-bundle.js -->
+                <button id="btnAction1" class="ctrl-btn active-action" title="Step 1 Action">
+                  <span id="btnAction1Label">1. Weigh Bottle + Salt</span>
+                </button>
+                <button id="btnAction2" class="ctrl-btn" disabled title="Step 2 Action">
+                  <span id="btnAction2Label">2. Transfer to Flask</span>
+                </button>
+                <button id="btnAction3" class="ctrl-btn" disabled title="Step 3 Action">
+                  <span id="btnAction3Label">3. Reweigh Empty Bottle</span>
+                </button>
+                <button id="btnAction4" class="ctrl-btn" disabled title="Step 4 Action">
+                  <span id="btnAction4Label">4. Wash Funnel (Water)</span>
+                </button>
+                <button id="btnAction5" class="ctrl-btn" disabled title="Step 5 Action">
+                  <span id="btnAction5Label">5. Swirl to Dissolve</span>
+                </button>
+                <button id="btnAction6" class="ctrl-btn" disabled title="Step 6 Action">
+                  <span id="btnAction6Label">6. Make Up to 250 mL</span>
+                </button>
+                <button id="btnAction7" class="ctrl-btn" disabled title="Step 7 Action">
+                  <span id="btnAction7Label">7. Stopper & Mix</span>
+                </button>
+                <button id="btnAction8" class="ctrl-btn" disabled title="Step 8 Action">
+                  <span id="btnAction8Label">8. Calculate Molarity</span>
+                </button>
+                <button id="btnNextTrial" class="ctrl-btn controls-full-btn" disabled title="Start Next Trial" style="display: none;">
+                  <span>🔁 Start Next Trial</span>
+                </button>
+                <button id="btnResetTrial" class="ctrl-btn controls-full-btn" style="border-color: #cbd5e1; color: #64748b;" title="Reset Current Step/Trial">
+                  <span>↺ Reset Step</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="table">
+          <h3 class="section-title">Results</h3>
+          <div class="results-tab-bar">
+            <button type="button" id="tabBtnPhase1" class="results-tab-btn active" onclick="switchResultsTab('phase1')">Phase 1: EDTA Prep</button>
+            <button type="button" id="tabBtnPhase2" class="results-tab-btn" onclick="switchResultsTab('phase2')">Phase 2: Total Hardness</button>
+            <button type="button" id="tabBtnAll" class="results-tab-btn" onclick="switchResultsTab('all')">All Results</button>
+          </div>
+          <div class="results-section">
+            <div class="task-section data-table task-section--table" id="datatable1">
+              <div id="obsTablePhase1" style="width: 100%;"></div>
+              <div id="obsTablePhase2" style="width: 100%; display: none;"></div>
+            </div>
+            <div class="task-section task-section--results">
+              <!-- Phase 1 Calculation Card -->
+              <div class="calc-card" id="calcCardPhase1">
+                <div class="calc-title">Phase 1: Preparation of Standard EDTA Solution</div>
+                <div class="calc-formula-box">
+                  Weight of EDTA transferred (W) = W₁ - W₂<br>
+                  Molarity of EDTA = (W × 4) / 372.24
+                </div>
+                <div class="calc-input-group">
+                  <label for="inputFactorCheck" style="font-size: 1rem;">EDTA Molarity (M):</label>
+                  <input type="number" step="0.0001" id="inputFactorCheck" class="calc-input" placeholder="e.g. 0.0100" />
+                  <button type="button" id="btnCheckFactor" class="btn-calc-check">Check</button>
+                  <button type="button" id="btnStepsFactor" class="btn-calc-steps">Steps</button>
+                </div>
+                <div id="stepsFactorContent" class="calc-steps-content"></div>
+              </div>
+
+              <!-- Phase 2 Calculation Card -->
+              <div class="calc-card" id="calcCardPhase2" style="display: none;">
+                <div class="calc-title">Phase 2: Determination of Total Hardness</div>
+                <div class="calc-formula-box">
+                  (MV)Hard Water = (MV)EDTA<br>
+                  MHard Water = (M × V)EDTA / 25.0<br>
+                  Total Hardness = MHard Water × 100.087 × 1000 ppm CaCO₃
+                </div>
+                <div class="calc-input-group">
+                  <label for="inputHardnessCheck" style="font-size: 1rem;">Total Hardness (ppm CaCO₃):</label>
+                  <input type="number" step="0.1" id="inputHardnessCheck" class="calc-input" placeholder="e.g. 240.0" />
+                  <button type="button" id="btnCheckHardness" class="btn-calc-check">Check</button>
+                  <button type="button" id="btnStepsHardness" class="btn-calc-steps">Steps</button>
+                </div>
+                <div id="stepsHardnessContent" class="calc-steps-content"></div>
+              </div>
+
+              <!-- Results Summary -->
+              <div class="results-summary-box">
+                <div><strong>EDTA Molarity: </strong><span id="resEdtaFactor">--</span></div>
+                <div><strong>Concordant Titre: </strong><span id="resConcordantTitre">--</span></div>
+                <div><strong>Total Hardness: </strong><span id="resTotalHardness" class="res-val-highlight">--</span></div>
+                <div style="margin-top: 0.3rem;"><strong>Quality: </strong><span id="resHardnessCategory">Perform titration to classify.</span></div>
+              </div>
+
+              <!-- BIS Inference & Compliance Card -->
+              <div class="inference-box" id="inferenceBox" style="display: none;">
+                <div class="inference-title">📋 BIS Drinking Limit (IS 10500:2012)</div>
+                <p class="inference-desc">
+                  <strong>Statement:</strong> The acceptable limit of total hardness in drinking water is <strong>200 mg/L (ppm)</strong>, and the permissible limit in the absence of an alternate source is <strong>600 mg/L (ppm)</strong>.
+                </p>
+                <div class="inference-actions">
+                  <span style="font-weight: 600; font-size: 1rem;">Is this statement:</span>
+                  <label class="inference-radio-label">
+                    <input type="radio" name="bisInference" value="true" /> True
+                  </label>
+                  <label class="inference-radio-label">
+                    <input type="radio" name="bisInference" value="false" /> False
+                  </label>
+                  <button type="button" id="btnSubmitInference" class="btn-calc-check">Submit</button>
+                </div>
+                <div id="inferenceFeedback" class="inference-feedback-msg" style="display: none;"></div>
+                <div id="sampleComplianceBox" class="sample-compliance-box" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-menus">
+      <button class="ctrl-btn sim-btn" onclick="scrollToSimulation()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#089B93" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.25V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V8.25m-18 0V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v2.25m-18 0h18M5.25 6h.008v.008H5.25V6zM7.5 6h.008v.008H7.5V6zm2.25 0h.008v.008H9.75V6z" />
+        </svg>
+        <span>Simulation</span>
+      </button>
+
+      <button class="ctrl-btn result-btn" onclick="scrollToTable()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" stroke="#089B93" class="icon">
+          <path fill-rule="evenodd" d="M2.625 6.75a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875 0A.75.75 0 0 1 8.25 6h12a.75.75 0 0 1 0 1.5h-12a.75.75 0 0 1-.75-.75ZM2.625 12a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0ZM7.5 12a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5h-12A.75.75 0 0 1 7.5 12Zm-4.875 5.25a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875 0a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5h-12a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" stroke-width="1" />
+        </svg>
+        <span>Result</span>
+      </button>
+
+      <button class="ctrl-btn variables-btn" onclick="scrollToVariables()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" stroke="#089B93" class="icon">
+          <path fill-rule="evenodd" d="M19.253 2.292a.75.75 0 0 1 .955.461A28.123 28.123 0 0 1 21.75 12c0 3.266-.547 6.388-1.542 9.247a.75.75 0 1 1-1.416-.494c.94-2.7 1.458-5.654 1.458-8.753s-.519-6.054-1.458-8.754a.75.75 0 0 1 .461-.954Zm-14.227.013a.75.75 0 0 1 .414.976A23.183 23.183 0 0 0 3.75 12c0 3.085.6 6.027 1.69 8.718a.75.75 0 0 1-1.39.563c-1.161-2.867-1.8-6-1.8-9.281 0-3.28.639-6.414 1.8-9.281a.75.75 0 0 1 .976-.414Z" clip-rule="evenodd" stroke-width="1" />
+        </svg>
+        <span>Variables</span>
+      </button>
+    </div>
+    <p class="footer-copy">© Copyright @ SOLVE - The Virtual Lab @ NITK</p>
+  </footer>
+  </div>
+
+  <script>
+    function scrollToSimulation() {
+      if (window.innerWidth <= 1050) {
+        document.querySelector(".simulation")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+    function scrollToTable() {
+      if (window.innerWidth <= 1050) {
+        document.querySelector(".table")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+    function scrollToVariables() {
+      if (window.innerWidth <= 1050) {
+        document.querySelector(".var-controls")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  </script>
+</body>
+</html>
